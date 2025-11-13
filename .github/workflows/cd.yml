@@ -1,0 +1,60 @@
+name: CD
+
+on:
+  push:
+    branches: [ github-actions ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup SSH key
+      run: |
+        mkdir -p ~/.ssh
+        echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/vm_key
+        chmod 600 ~/.ssh/vm_key
+        
+    - name: Deploy to VM
+      run: |
+        echo "Starting deployment..."
+        ssh -o StrictHostKeyChecking=no \
+            -o ConnectTimeout=15 \
+            -i ~/.ssh/vm_key \
+            -p 2451 \
+            user@course.prafdin.ru << 'EOF'
+          set -e  # Exit on any error
+          
+          echo "Changing to project directory..."
+          cd /home/user/Desktop/lab1/catty-reminders-app
+          
+          echo "Pulling latest code..."
+          git fetch origin
+          git reset --hard origin/github-actions
+          
+          echo "Setting up virtual environment..."
+          if [ ! -d "venv" ]; then
+            python3 -m venv venv
+          fi
+          
+          echo "Installing dependencies..."
+          source venv/bin/activate
+          pip install --upgrade pip
+          pip install -r requirements.txt
+          
+          echo "Restarting service..."
+          sudo systemctl daemon-reload
+          sudo systemctl restart catty.service
+          sleep 5
+          
+          echo "Checking service status..."
+          sudo systemctl status catty.service --no-pager
+          
+          echo "Checking if application is running..."
+          curl -f http://localhost:8181 || echo "Application check failed but continuing..."
+          
+          echo "Deployment completed successfully!"
+          echo "Application: http://app.spiridonova.course.prafdin.ru"
