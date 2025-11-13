@@ -58,3 +58,4 @@ jobs:
           
           echo "Deployment completed successfully!"
           echo "Application: http://app.spiridonova.course.prafdin.ru"
+        EOF
