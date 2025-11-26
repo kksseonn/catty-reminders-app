@@ -1,25 +1,25 @@
-version: '3.9'
+version: "3.9"
 
 services:
-  backend:
+  app:
     image: ghcr.io/kksseonn/catty-reminders:latest
-    container_name: catty-backend
+    container_name: catty-reminders
     restart: unless-stopped
-    ports:
-      - "8181:8181"
     depends_on:
       - db
     environment:
-      DATABASE_URL: postgresql://app:app@db:5432/reminders
+      DATABASE_URL: postgresql://catty:cattypassword@db:5432/cattydb
+    ports:
+      - "8181:8181"
 
   db:
-    image: postgres:16
-    container_name: catty-db
+    image: postgres:15
+    container_name: catty-reminders-db
     restart: unless-stopped
     environment:
-      POSTGRES_DB: reminders
-      POSTGRES_USER: app
-      POSTGRES_PASSWORD: app
+      POSTGRES_USER: catty
+      POSTGRES_PASSWORD: cattypassword
+      POSTGRES_DB: cattydb
     volumes:
       - db_data:/var/lib/postgresql/data
 

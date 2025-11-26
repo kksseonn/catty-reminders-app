@@ -7,7 +7,7 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-
+    
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -25,19 +25,18 @@ jobs:
               -i ~/.ssh/vm_key \
               -p 2451 \
               user@course.prafdin.ru "
-            
+
             echo 'Logging in to GHCR...'
             echo '${{ secrets.GITHUB_TOKEN }}' | docker login ghcr.io -u ${{ github.actor }} --password-stdin
-            
-            echo 'Pulling updated images...'
-            docker compose -f ~/Desktop/lab1/catty-reminders-app/docker-compose.yaml pull
 
-            echo 'Recreating stack...'
-            docker compose -f ~/Desktop/lab1/catty-reminders-app/docker-compose.yaml up -d
+            cd ~/app || mkdir ~/app && cd ~/app
 
-            echo 'Cleaning unused images...'
-            docker image prune -f
+            echo 'Pulling newest image...'
+            docker compose pull
 
-            echo 'Deployment complete!'
-            docker compose -f ~/Desktop/lab1/catty-reminders-app/docker-compose.yaml ps
+            echo 'Starting stack...'
+            docker compose up -d
+
+            echo 'Status:'
+            docker compose ps
           "
