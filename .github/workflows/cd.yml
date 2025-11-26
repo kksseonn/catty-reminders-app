@@ -7,7 +7,7 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -18,9 +18,8 @@ jobs:
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/vm_key
           chmod 600 ~/.ssh/vm_key
 
-      - name: Deploy Docker container to VM
+      - name: Deploy using Docker Compose
         run: |
-          echo "Starting Docker deployment..."
           ssh -o StrictHostKeyChecking=no \
               -o ConnectTimeout=15 \
               -i ~/.ssh/vm_key \
@@ -30,25 +29,15 @@ jobs:
             echo 'Logging in to GHCR...'
             echo '${{ secrets.GITHUB_TOKEN }}' | docker login ghcr.io -u ${{ github.actor }} --password-stdin
             
-            echo 'Pulling latest Docker image...'
-            docker pull ghcr.io/kksseonn/catty-reminders:latest
-            
-            echo 'Stopping old container if exists...'
-            docker stop catty || true
-            docker rm catty || true
-            
-            echo 'Starting new container...'
-            docker run -d \
-              --name catty \
-              --restart unless-stopped \
-              -p 8181:8181 \
-              ghcr.io/kksseonn/catty-reminders:latest
-            
-            echo 'Cleaning up old images...'
+            echo 'Pulling updated images...'
+            docker compose -f ~/catty/docker-compose.yaml pull
+
+            echo 'Recreating stack...'
+            docker compose -f ~/catty/docker-compose.yaml up -d
+
+            echo 'Cleaning unused images...'
             docker image prune -f
-            
-            echo 'Docker deployment completed!'
-            echo 'Container status:'
-            docker ps --filter 'name=catty'
-            echo 'Application available at: http://app.spiridonova.course.prafdin.ru'
+
+            echo 'Deployment complete!'
+            docker compose -f ~/catty/docker-compose.yaml ps
           "
