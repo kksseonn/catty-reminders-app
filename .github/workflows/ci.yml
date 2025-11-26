@@ -42,8 +42,7 @@ jobs:
     - name: Run unit tests
       run: |
         python -m pytest tests/test_unit.py -v
-        
-jobs:
+
   docker:
     runs-on: ubuntu-latest
     if: github.event_name == 'push' && github.ref == 'refs/heads/multicontainers'
