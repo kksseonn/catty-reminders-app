@@ -9,7 +9,7 @@ This module provides security and authentication.
 import jwt
 import secrets
 
-from app import db_path, users, secret_key
+from app import db_config, users, secret_key
 from app.utils.exceptions import UnauthorizedException, UnauthorizedPageException
 from app.utils.storage import ReminderStorage
 
