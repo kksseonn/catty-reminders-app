@@ -2,12 +2,12 @@ name: CD
 
 on:
   release:
-    types: [ published ]
+    types: [published]
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -18,25 +18,24 @@ jobs:
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/vm_key
           chmod 600 ~/.ssh/vm_key
 
-      - name: Deploy using Docker Compose
+      - name: Copy docker-compose.yaml to VM
+        run: |
+          scp -i ~/.ssh/vm_key -P 2451 /home/user/Desktop/lab1/catty-reminders-app/docker-compose.yaml user@course.prafdin.ru:~/app/
+
+      - name: Deploy with Docker Compose
         run: |
           ssh -o StrictHostKeyChecking=no \
-              -o ConnectTimeout=15 \
-              -i ~/.ssh/vm_key \
-              -p 2451 \
-              user@course.prafdin.ru "
+              -i ~/.ssh/vm_key -p 2451 user@course.prafdin.ru "
+                mkdir -p ~/app
+                cd ~/app
 
-            echo 'Logging in to GHCR...'
-            echo '${{ secrets.GITHUB_TOKEN }}' | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+                docker compose version || echo 'Docker Compose не установлен'
 
-            cd ~/app || mkdir ~/app && cd ~/app
+                echo '${{ secrets.GITHUB_TOKEN }}' | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
-            echo 'Pulling newest image...'
-            docker compose pull
+                docker compose pull
 
-            echo 'Starting stack...'
-            docker compose up -d
+                docker compose up -d
 
-            echo 'Status:'
-            docker compose ps
-          "
+                docker compose ps
+              "
