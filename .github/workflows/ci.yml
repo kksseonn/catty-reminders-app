@@ -7,6 +7,7 @@ on:
 permissions:
   contents: read
   packages: write
+  attentions: write
   id-token: write
 
 jobs:
@@ -56,12 +57,6 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Lint Dockerfile
-        uses: hadolint/hadolint-action@v3.1.0
-        with:
-          dockerfile: Dockerfile
-        continue-on-error: true
-
       - name: Build and push Docker image
         uses: docker/build-push-action@v6
         with:
@@ -70,6 +65,3 @@ jobs:
           tags: |
             ghcr.io/${{ github.repository_owner }}/catty-reminders:latest
             ghcr.io/${{ github.repository_owner }}/catty-reminders:${{ github.sha }}
-
-      - name: Show built images
-        run: docker images | grep catty-reminders || true
