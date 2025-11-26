@@ -72,4 +72,4 @@ jobs:
             ghcr.io/${{ github.repository_owner }}/catty-reminders:${{ github.sha }}
 
       - name: Show built images
-        run: docker images | grep catty-reminders
+        run: docker images | grep catty-reminders || true
