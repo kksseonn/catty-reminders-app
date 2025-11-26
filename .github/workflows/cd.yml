@@ -30,14 +30,14 @@ jobs:
             echo '${{ secrets.GITHUB_TOKEN }}' | docker login ghcr.io -u ${{ github.actor }} --password-stdin
             
             echo 'Pulling updated images...'
-            docker compose -f ~/catty-reminders-app/docker-compose.yaml pull
+            docker compose -f ~/lab1/catty-reminders-app/docker-compose.yaml pull
 
             echo 'Recreating stack...'
-            docker compose -f ~/catty-reminders-app/docker-compose.yaml up -d
+            docker compose -f ~/lab1/catty-reminders-app/docker-compose.yaml up -d
 
             echo 'Cleaning unused images...'
             docker image prune -f
 
             echo 'Deployment complete!'
-            docker compose -f ~/catty-reminders-app/docker-compose.yaml ps
+            docker compose -f ~/lab1/catty-reminders-app/docker-compose.yaml ps
           "
