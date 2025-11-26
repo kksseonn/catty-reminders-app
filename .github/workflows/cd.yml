@@ -18,9 +18,10 @@ jobs:
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/vm_key
           chmod 600 ~/.ssh/vm_key
 
-      - name: Copy docker-compose.yaml to VM
+      - name: Copy docker-compose and config.json to VM
         run: |
           scp -i ~/.ssh/vm_key -P 2451 docker-compose.yaml user@course.prafdin.ru:~/app/
+          scp -i ~/.ssh/vm_key -P 2451 config.json user@course.prafdin.ru:~/app/
 
       - name: Deploy with Docker Compose
         run: |

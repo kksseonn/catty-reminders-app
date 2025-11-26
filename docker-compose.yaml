@@ -5,23 +5,11 @@ services:
     image: ghcr.io/kksseonn/catty-reminders:latest
     container_name: catty-reminders
     restart: unless-stopped
-    depends_on:
-      - db
-    environment:
-      DATABASE_URL: postgresql://catty:cattypassword@db:5432/cattydb
     ports:
       - "8181:8181"
-
-  db:
-    image: postgres:15
-    container_name: catty-reminders-db
-    restart: unless-stopped
-    environment:
-      POSTGRES_USER: catty
-      POSTGRES_PASSWORD: cattypassword
-      POSTGRES_DB: cattydb
     volumes:
-      - db_data:/var/lib/postgresql/data
+      - catty_data:/catty-reminders-app/data
+      - ./config.json:/catty-reminders-app/config.json:ro
 
 volumes:
-  db_data:
+  catty_data:
