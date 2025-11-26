@@ -18,26 +18,33 @@ jobs:
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/vm_key
           chmod 600 ~/.ssh/vm_key
 
-      - name: Copy docker-compose and config.json to VM
+      - name: Deploy with Docker Compose to VM
         run: |
-          scp -o StrictHostKeyChecking=no -i ~/.ssh/vm_key -P 2451 docker-compose.yaml user@course.prafdin.ru:~/app/
-          scp -o StrictHostKeyChecking=no -i ~/.ssh/vm_key -P 2451 config.json user@course.prafdin.ru:~/app/
-
-      - name: Deploy with Docker Compose
-        run: |
+          echo "Starting Docker Compose deployment..."
           ssh -o StrictHostKeyChecking=no \
               -o ConnectTimeout=15 \
               -i ~/.ssh/vm_key \
               -p 2451 \
               user@course.prafdin.ru "
-      
-              docker login ghcr.io -u ${{ github.actor }} -p ${{secrets.GITHUB_TOKEN}}
-
-              cd ~/Desktop/lab1/catty-reminders-app || exit 1
-
-              docker compose -f docker-compose.yml pull
-              
-              docker compose -f docker-compose.yml down || true
-
-              docker compose -f docker-compose.yml up -d
-            "
+            echo 'Creating necessary directories...'          
+            
+            echo 'Logging in to GHCR...'
+            echo '${{ secrets.GITHUB_TOKEN }}' | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+            
+            echo 'Pulling latest images...'
+            docker compose -f ~/catty-reminders-app/docker-compose.yml pull
+            
+            echo 'Stopping and removing old containers...'
+            docker compose -f ~/catty-reminders-app/docker-compose.yml down
+            
+            echo 'Starting new containers with Docker Compose...'
+            docker compose -f ~/catty-reminders-app/docker-compose.yml up -d
+            
+            echo 'Cleaning up...'
+            docker image prune -f
+            
+            echo 'Docker Compose deployment completed!'
+            echo 'Containers status:'
+            docker compose -f ~/catty-reminders-app/docker-compose.yml ps
+            echo 'Application: http://app.spiridonova.course.prafdin.ru'
+          "
