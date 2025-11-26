@@ -26,6 +26,7 @@ from testlib.inputs import User
 
 def test_successful_login(page: Page, user: User):
 
+
   # Given the login page is displayed  
   page.goto('/login')
   page.wait_for_load_state('networkidle')
@@ -34,6 +35,7 @@ def test_successful_login(page: Page, user: User):
   # Wait for elements to be ready and visible
   username_field = page.locator('[name="username"]')
   password_field = page.locator('[name="password"]')
+  
   
   expect(username_field).to_be_visible()
   expect(password_field).to_be_visible()
