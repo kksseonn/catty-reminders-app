@@ -40,4 +40,9 @@ jobs:
             
             echo 'Starting new containers with Docker Compose...'
             docker compose -f docker-compose.yml up -d
+
+            echo 'Docker Compose deployment completed!'
+            echo 'Containers status:'
+            docker compose -f ~/catty-reminders-app/docker-compose.yml ps
+            echo 'Application: http://app.spiridonova.course.prafdin.ru'
           "
