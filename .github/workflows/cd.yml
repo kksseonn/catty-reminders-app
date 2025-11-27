@@ -43,6 +43,6 @@ jobs:
 
             echo 'Docker Compose deployment completed!'
             echo 'Containers status:'
-            docker compose -f ~/catty-reminders-app/docker-compose.yml ps
+            docker compose -f ~/Desktop/lab1/catty-reminders-app/docker-compose.yml ps
             echo 'Application: http://app.spiridonova.course.prafdin.ru'
           "
